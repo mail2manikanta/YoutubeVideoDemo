@@ -6,6 +6,8 @@
 //  Copyright © 2017 Mallabelly, Manikanta. All rights reserved.
 //
 
+import Google
+import GoogleSignIn
 import UIKit
 
 @UIApplicationMain
@@ -13,10 +15,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Configure GoogleSignIn service
+        configureGoogleSignIn()
         return true
+    }
+    
+    // Initialize sign-in
+    func configureGoogleSignIn() {
+        var configureError: NSError?
+        GGLContext.sharedInstance().configureWithError(&configureError)
+        assert(configureError == nil, "Error configuring Google services: \(String(describing: configureError))")
+    }
+    
+    // Handle url scheme
+    func application(_ application: UIApplication,
+                     open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return GIDSignIn.sharedInstance().handle(url,
+                                                 sourceApplication: sourceApplication,
+                                                 annotation: annotation)
+    }
+    
+    @available(iOS 9.0, *)
+    func application(_ app: UIApplication, open url: URL,
+                     options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+        let sourceApplication = options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String
+        let annotation = options[UIApplicationOpenURLOptionsKey.annotation]
+        return GIDSignIn.sharedInstance().handle(url,
+                                                 sourceApplication: sourceApplication,
+                                                 annotation: annotation)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -40,7 +67,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
 
